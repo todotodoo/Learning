@@ -58,4 +58,63 @@
      Nil则指向空的类（是class，不是对象）
      IMP定义为id(*IMP)(id, SEL, …) 一个指向函数的指针，这个被指向的函数包括id(“self”指针), 调用SEL(方法名)，再加上其他参数，说明IMP就是实现方法。
 
-12.
+12. KVC(Key-Value Coding) NSKeyValueCoding， 一个非正式的protocol，提供一种机制来间接访问对象的属性。
+
+     void changeValue(Person *p, NSString *newName) {
+          NSString *originName = [p valueForKey:@"name"];
+          [p setValue:newName forKey:@“name"];
+          NSString *spouseName = [p valueForKeyPath:@“spouse.name"];
+          //==[[p valueForKey:@“spouse”] valueForKey:@“name"];
+     }
+
+     注册指定路径的监听器：addObserver:forKeyPath:options:context:
+     删除指定路径的监听器：removeObserver:forKeyPath、removeObserver:forKeyPath:context:
+     回调监听方法：observerValueForKeyPath:foObject:change:context:
+
+     KVO使用步骤：
+     1). 通过addObserver:forKeyPath:options:context:，为监听对象（通常为数据模型）注册监听器；
+     2). 重写监听器的observerValueForKeyPath:ofObject:change:context:方法。
+
+13. 几点需要注意的：
+     1). 不要在initialiter和dealloc中使用accessor method(如self.property = ...);
+     2). foundamental collection class移除时，会对其拥有的对象发送release（而不是autorelease）消息。如：
+          aObject = [array objectAtIndex:n];
+          [array removeObjectAtIndex:n];
+          //aObject此时已经无效
+          
+          改为：
+          aObject = [[array objectAtIndex:n] retain];
+          [array removeObjectAtIndex:n];
+          //use aObject
+          [aObject release];
+     3). 注意不要对这些内存管理操作：file descriptors, network connections, buffers, caches in a dealloc method.
+     
+14. Collections own the objects they contain.
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    NSInteger i;
+    
+    for (i = 0; i < 10; ++i) {
+          NSNumber *convenienceNumber = [NSNumber numberWithInteger: i];
+          [array addObject:convenienceNumber];
+          //==
+          NSNumber *allocNumber = [[NSNumber alloc] initWithInteger:i];
+          [array addObject: allocNumber];//会retain
+          [allocNumber release];
+          
+     }
+     
+15. Objective-C Runtime编程
+     1). Dynamically loading new classes at runtime;
+     2). Forwarding message to other objects;
+     3). Find information about objects.
+     
+     isKindOfClass, isMemberOfClass, respondsToSelector, conformsToProtocol, methodForSelector等
+     提供C语言使用函数接口，也就是Plain C。使用Objective-C特性。
+     /usr/include/objc
+
+
+
+16. 
+
+
+
