@@ -1,0 +1,32 @@
+
+iOS死锁代码：
+
+1. 在main queue执行同步block
+  dispatch_queue_t queue = dispatch_get_main_queue();
+  dispatch_sync(queue, ^{ NSLog(@"...");});
+  
+2. 在main queue中异步执行的block等待main queue执行同步block结束
+  dispatch_queue_t queue = dispatch_get_main_queue();
+  dispatch_async(queue, ^ {
+    dispatch_sync(queue, ^{ NSLog(@"...");});
+  });
+
+3.两次lock
+  NSLock *lock1 = [[NSLock alloc] init];
+  [lock1 lock];
+  [lock1 lock];
+  [lock1 unlock];
+  [lock1 unlock];
+     
+4.semaphore为0,而且一直等待
+  dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+  dispatch_async(dispatch_get_main_queue(), ^{
+      dispatch_semaphore_signal(sem);
+  });
+  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+
+5.同2，Serial Queue也会
+  dispatch_queue_t queue = dispatch_queue_create("Test", NULL);
+  dispatch_async(queue, ^{
+      dispatch_sync(queue, ^{ NSLog(@"Hello."); });
+  });
