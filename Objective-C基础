@@ -108,13 +108,79 @@
      2). Forwarding message to other objects;
      3). Find information about objects.
      
-     isKindOfClass, isMemberOfClass, respondsToSelector, conformsToProtocol, methodForSelector等
+     isKindOfClass是否是class或者其派生class的对象；
+     isMemberOfClass是否是该class的对象，比isKindOfClass严格；
+     respondsToSelector是否实现了某个method；
+     conformsToProtocol是否遵守讴歌特定的protocol；
+     methodForSelector获得一个指向方法实现的指针。由Cocoa runtime system提供，不是Objective-C特性，比message快，
+     一般在调用次数多的时候才那么用。
+     
+     void(*setter)(id, SEL, BOOL);
+     int i;
+     setter = (void(*)(id, SEL, BOOL))[target methodForSelector:@selector(setFailed:)];
+     for (i = 0; i < 100; ++i) {
+          setter(target[i], @selector(setFailed:), YES);
+     }
+     
      提供C语言使用函数接口，也就是Plain C。使用Objective-C特性。
      /usr/include/objc
 
+16. 动态方法实现（Dynamic Method Resolution）
+     resolveInstanceMethod:
+     resolveClassMethod:
+     
+     void dynamicMethodIMP(id self, SEL __cmd) {
+          //...
+     }
+     
+     +(BOOL)resolveInstanceMethod:(SEL)aSEL {
+          if (aSEL == @selector(resolveThisMethodDynamically)) {
+               class_addMethod([self class], aSEL, (IMP)dynamicMethodIMP, "v@:");
+               return YES;
+          }
+          
+          return [super resolveInstanceMethod:aSEL];
+     }
+
+17. 动态加载（Dynamic Loading）
+     1). objc/objc_load.h     objc_loadModules
+     2). Cocoa's NSBundle
+
+18. NSInvocation
+     实现forwardInvocation: 给message一个默认回复，以免运行时错误。
+     
+     工作方法：
+     When an object can't respond to a message because it doesn't have a method matching the selector in
+     the message, the runtime system informs(通知) the object by sending it a forwardInvocation: message.
+
+     To forward a message, all a forwardInvocation: method needs to do is:
+     1). Determine where the message should go, and 
+     2). send it there with its original arguments.
+     
+     -(void)forwardInvocation:(NSInvocation *)anInvocation {
+          if ([someOtherObject respondsToSelector:[anInvocation selector]]) {
+               [anInvocation invokeWithTarget:someOtherObject];
+          } else {
+               [super forwardInvocation:anInvocation];
+          }
+     }
+     
+     对于unrecognized messages，一个forwardInvocation:方法起到一个分发中心的作用。注意：只有在处理不存在
+     的method时，runtime system才会向object发送forwardInvocation:消息。
+     
+     
+     Forwarding：
+     1). Multiple Inheritance；
+     2). Surrogate objects。
+     
+     注意：respondsToSelector:和isKindOfClass:只会查找继承关系链，不会查找forwarding chain。如果想你的objects to act
+     as if they truly inherited the behavior of the objects they forward messages to, ni需要重新实现respondsToSelector:和
+     isKindOfClass:，还有instanceRespondToSelector:，conformsToProtocol:，methodSignatureForSelector:。
 
 
-16. 
+
+
+
 
 
 
