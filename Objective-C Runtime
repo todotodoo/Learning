@@ -1,0 +1,24 @@
+
+Runtime 知识点：
+
+1. Message forwarding
+
+2. Objects，Classes，MetaClass
+
+3. Method， Selector和IMP
+
+4. class运行时方法：class, ivar, method, objc propert, protocol, sel
+
+5. Method Swizzling：class_getInstanceMethod()，method_exchangeImplementations()
+
+6. 动态继承、交换：object_setClass(obj, [SubClass class])，在Key-Value编程中用到。当开始observing一个object时，Cocoa会创建这个
+  object的class的subClass，在subClass加入KVO的相关监听函数调用，然后将这个object的isa指针指向创建的subClass。
+  
+7. 动态方法处理：resolveInstanceMethod:和resolveClassMethod:等
+
+8. 消息转发：forwardingTargetForSelector:和forwardInvocaion:
+
+9. 使用Block作为Method IMP
+  IMP myIMP = imp_implementationWithBlock(^(id _self, NSString *str){ NSLog(@"..."); });
+  
+  class_addMethod([MyClass class], @selector(sayHello:), myIMP, "v@:@");
