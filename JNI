@@ -1,0 +1,26 @@
+JNI调用Java静态方法：
+
+注意：静态是指无法获取上下文相关的jobject情况下。
+
+JavaVM *global_vm;//全局保存指针
+JNIEnv *global_env;//环境指针
+jclass *global_cls;
+
+1). 重写jint JNICALL JNI_OnLoad():
+  jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    global_vm = vm;
+    return JNI_VERSION_1_4;
+  }
+  
+2). 在C代码中通过JavaVM调用指定class的静态方法：
+  if (global_vm) {
+    if ((*global_vm)->GetEnv(global_env, (void**)global_env, JNI_VERSION_1_4) == JNI_OK) {
+      global_cls = (*global_env)->FindClass(global_env, "com/test/helloword/MainActivity");
+      
+      jmethodID methodIdFunc = (*global_env)->GetStaticMethdoID(global_env, global_cls, "TestFunction", "()V");
+      
+      (*global_env)->CallStaticVoidMethod(global_env, global_cls, methodIdFunc);
+    }
+  }
+  
+还有对JNI的so数字签名验证的问题，后续更新。
