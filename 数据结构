@@ -1,0 +1,40 @@
+1. 链表逆序
+
+typedef struct Node_ {
+  int data;
+  struct Node_ *next;
+}*Node;
+
+Node temp = 0, nextTemp = 0;
+
+1).用两个变量
+void listReverse(Node *list) {
+  if (list == 0) {
+    return;
+  }
+  
+  while(list->next) {
+    nextTemp = list->next;
+    list->next = temp;
+    temp = list;
+    list = nextTemp;
+  }
+}
+
+2). 只能用一个变量
+
+Node *head;
+
+Node *listReverse(Node *list) {
+  if (list == 0 || list->next == 0) {
+    head = p;
+    return head;
+  }
+  
+  listReverse(list->next)->next = list;
+  
+  list->next = 0;
+  
+  return list;
+}
+
