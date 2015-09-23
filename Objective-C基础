@@ -1,0 +1,61 @@
+1. Objective-C implementation:
+     1). GCC
+     2). NeXT
+     3). Apple
+     4). Portable Object Compiler
+
+2. 不支持内联函数，但是Block可以达到类似的效果；不支持namespace、multiple inheritance、operator overloading.
+
+3. Category
+     1). 在没有source code和recompile的情况下为class添加方法；
+     2). Category覆盖原有的方法；
+     3). 如果有两个Category包含相同的method，这种情况下会使用哪个是未定义的；
+     4). 在Category加入方法，不仅影响当前class，同样会影响其子class。所以像NSObject这样的Root class加Category是很危险的；
+     5). 在Category加入方法可能会打乱原有的设计；
+     6). object/category的名字必须是全局唯一的。因为Objective-C的namespace is shared between the program code and all the libraries, frameworks, and plug-ins.
+
+4. Cocoa Touch API for iOS. 主要包含：gesture recognition，animation.
+     Foundation Kit Framework
+     UIKit Framework
+     ...
+
+5. Class Extensions: 与Category不同，在（）省略。
+     1). Adding additional instance variables and properties;
+     2). 实现职能在main implementation section中，不能在separate implementation;
+     3). Methods are private. 但if someone owns the name of a private method, she can still call it.
+注：Category重写方法，后，原来的方法就无法简单调用到了。但是，派生类重写，可以通过super关键字调用。如果在Category重写方法后，也可以通过Objective-C的Runtime来调用原有方法，method_exchangeImplemetation.
+
+6. Objective-C函数参数传递：
+     1). 传variable值传递；
+     2). object时，引用。
+
+7. Copy
+
+     copyWithZone 返回一个immutable copy;
+     mutableCopyWithZone 返回一个mutable one. 如：
+
+     @interface Fraction : NSObject <NSCopying>
+
+     @implementation
+     -(id)copyWithZone:(NSZone *)zone {
+         Fraction *newFrac = [[Fraction allWithZone:zone] init];
+         //...
+          return newFrac;
+     }
+     @end
+
+8. 关于copyWithZone的使用注意事项：
+     1). 该方法会被子类继承；
+     2). 如果当前类的父类也实现了<NSCopying> protocol，则应调用父类的copy，然后再是该类的copy的代码。
+
+9. NSString, NSDictionary, NSArray, NSDate, NSNumber等writeToFile:方法，会再temporary backup file写入成功后再移到目的地。这样做是为了防止在写的时候出现corrupt，保证原始文件不会被harmed。
+
+10. delegate关心返回；而notification则关注通知。
+
+11. SEL是selector的一个类型，表示一个方法的名字。@selector
+     id是struct objc_object的一个指针，声明不需要加*。id是一个指向任何一个继承了Object类的对象。
+     nil指向一个Objective-C对象，这个对象的指针指向空。
+     Nil则指向空的类（是class，不是对象）
+     IMP定义为id(*IMP)(id, SEL, …) 一个指向函数的指针，这个被指向的函数包括id(“self”指针), 调用SEL(方法名)，再加上其他参数，说明IMP就是实现方法。
+
+12.
