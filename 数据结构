@@ -8,7 +8,7 @@ typedef struct Node_ {
 Node temp = 0, nextTemp = 0;
 
 1).用两个变量
-void listReverse(Node *list) {
+void listReverse(Node list) {
   if (list == 0) {
     return;
   }
@@ -23,9 +23,9 @@ void listReverse(Node *list) {
 
 2). 只能用一个变量
 
-Node *head;
+Node head;
 
-Node *listReverse(Node *list) {
+Node listReverse(Node list) {
   if (list == 0 || list->next == 0) {
     head = p;
     return head;
@@ -38,3 +38,19 @@ Node *listReverse(Node *list) {
   return list;
 }
 
+2.判断链表是否有环
+
+int isExistLoop(Node head) {
+  Node slow = head, fast = head;
+  
+  while(fast && fast->next) {
+    slow = slow->next;
+    fast = fast->next->next;
+    
+    if(slow == fast) {
+      break;
+    }
+  }
+  
+  return !(fase == 0 || fast->next == 0);
+}
