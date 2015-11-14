@@ -1,0 +1,25 @@
+1. 
+
+需求：在UITableView中，一列head view和cell view需要居中、文字右对齐。意思是：head view中UILabel的文字是垂直居中
+对齐，这时候文字与UILabel的右边框有个padding（内边距、缩进），而cell view中的文字右边与刚好也是需要有这个padding。这样整个表格既不
+浪费空间（如果是纯粹的左对齐或者右对齐，则浪费空间），而且还比较美观。
+
+思路：众所周知，UIButton是可以设置UIEdgeInsets，文字、图片，都可以设置与UIButton的边框的内边距。但UILabel貌似没有
+这个属性可以设置，只有简单的对齐方式。这时肯定会想着，可以用UIButton代替UILabel，但问题又出现了，UIButton不能显示
+多行，也就是说UIButton只能显示一行文字，这样也没有UILabel灵活。所以还是回到UILabel上。
+
+解决办法：
+UILabel继承于UIView，绘图过程中会调用drawRect:(CGrect)rect方法，这个方法的参数rect，就是UILabel的frame，这时候我们
+已经有了UILabel的frame，如果再有文字与右边的padding值，我们就可以重写UILabel的drawRect方法，
+方法内调用[super drawTextInRect:UIEdgeInsetsInsetRect(rect, self.labelInset)]，这个labelInset，就包含了padding值。
+这样，UILabel在绘图的时候，会读取self.labelInset，绘制文字。
+
+但还没有完成，假使我们根据上面的方法，新增一个名为InsetLabel的class，继承于UILabel，并且重写drawRect方法、提供设置
+labelInset的public方法。但是，在xib中实现的head view和cell view，怎么样才能使用该InsetLabel呢？
+并且要在系统调用drawRect之前，把实际的padding算出来，并且设置给labelInset。
+
+解决办法：在xib中，设置需要padding的UILabel的class为InsetLabel，然后建立xib与view之间的outlet。这样在UITableView的
+代理中，返回cell的时候，首先计算head view的文字与UILabel的padding值，作为参数调用InsetLabel的设置labelInset方法，
+即刻。
+
+2.
