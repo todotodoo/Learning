@@ -20,6 +20,6 @@ labelInset的public方法。但是，在xib中实现的head view和cell view，�
 
 解决办法：在xib中，设置需要padding的UILabel的class为InsetLabel，然后建立xib与view之间的outlet。这样在UITableView的
 代理中，返回cell的时候，首先计算head view的文字与UILabel的padding值，作为参数调用InsetLabel的设置labelInset方法，
-即刻。
+即可。
 
 2.
